@@ -44,6 +44,9 @@ The following arguments are supported:
 
 * `method` - (Optional) Method name. Default value is `GET`.
 
+* `skip_tls_verify` - (Optional) Disable verification of TLS certificates.
+  Default is false.
+
 ## Attributes Reference
 
 The following attributes are exported:

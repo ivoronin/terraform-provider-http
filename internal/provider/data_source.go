@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"io/ioutil"
 	"mime"
@@ -66,6 +67,14 @@ func dataSource() *schema.Resource {
 					Type: schema.TypeString,
 				},
 			},
+			"skip_tls_verify": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeBool,
+				},
+				Default: false,
+			},
 		},
 	}
 }
@@ -76,8 +85,13 @@ func dataSourceRead(ctx context.Context, d *schema.ResourceData, meta interface{
 	method := d.Get("method").(string)
 	request_body := d.Get("request_body").(string)
 	body_reader := strings.NewReader(request_body)
+	skip_tls_verify := d.Get("skip_tls_verify").(bool)
 
-	client := &http.Client{}
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: skip_tls_verify},
+	}
+
+	client := &http.Client{Transport: tr}
 
 	req, err := http.NewRequestWithContext(ctx, method, url, body_reader)
 	if err != nil {
